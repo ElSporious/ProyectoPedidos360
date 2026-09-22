@@ -1,0 +1,13 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <h2>Catálogo de Productos</h2>
+  <div class="product-grid">
+    <div class="product-card" *ngFor="let product of products">
+      <h3>{{ product.name }}</h3>
+      <p class="category">{{ product.category }}</p>
+      <p class="price">${{ product.price }}</p>
+      <button class="btn-primary">Agregar al pedido</button>
+    </div>
+  </div>
+</div>

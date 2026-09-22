@@ -1,0 +1,19 @@
+<nav class="navbar">
+  <div class="navbar-brand">
+    <a routerLink="/dashboard"><strong>Pedidos360</strong></a>
+  </div>
+
+  <div class="navbar-menu">
+    <a routerLink="/dashboard" routerLinkActive="active">Inicio</a>
+    <a routerLink="/catalog" routerLinkActive="active">Catálogo</a>
+    <a routerLink="/orders" routerLinkActive="active">Mis Pedidos</a>
+  </div>
+
+  <div class="navbar-user">
+    <div class="user-info">
+      <span class="user-name">{{ userName }}</span>
+      <span class="user-email">{{ userEmail }}</span>
+    </div>
+    <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+  </div>
+</nav>
