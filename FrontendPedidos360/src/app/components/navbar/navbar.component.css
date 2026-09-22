@@ -1,69 +1,175 @@
+/* Fuente base para el navbar */
+:host {
+  display: block;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Contenedor principal del Navbar */
 .navbar {
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 4.5rem; /* 72px */
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background-color: #0f172a;
-  color: #ffffff;
-  padding: 0.8rem 2rem;
+  justify-content: space-between;
 }
 
-.navbar-brand a {
-  color: #ffffff;
+/* === Logo y Marca === */
+.navbar-brand .brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   text-decoration: none;
+  color: #111827; /* Gris muy oscuro */
   font-size: 1.25rem;
+  transition: opacity 0.2s;
 }
 
+.navbar-brand .brand-link:hover {
+  opacity: 0.8;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+/* === Menú de Navegación === */
 .navbar-menu {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
+  align-items: center;
 }
 
-.navbar-menu a {
-  color: #94a3b8;
+.nav-link {
   text-decoration: none;
+  color: #4b5563; /* Gris medio */
   font-weight: 500;
-  transition: color 0.2s;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.navbar-menu a:hover,
-.navbar-menu a.active {
-  color: #ffffff;
+.nav-link:hover {
+  background-color: #f3f4f6; /* Gris claro al pasar el mouse */
+  color: #111827;
 }
 
+/* Estilo para la ruta activa */
+.nav-link.active-link {
+  background-color: #e0e7ff; /* Fondo índigo claro */
+  color: #4f46e5; /* Texto índigo oscuro */
+  font-weight: 600;
+}
+
+/* === Sección de Usuario === */
 .navbar-user {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Avatar moderno con gradiente */
+.avatar {
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  color: white;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  font-size: 0.85rem;
+  line-height: 1.2;
 }
 
 .user-name {
-  font-weight: bold;
-  color: #f8fafc;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
 }
 
 .user-email {
-  color: #94a3b8;
   font-size: 0.75rem;
+  color: #6b7280;
 }
 
+/* === Botón de Cerrar Sesión === */
 .btn-logout {
-  background-color: #ef4444;
-  color: white;
-  border: none;
+  background-color: transparent;
+  border: 1px solid #e5e7eb;
+  color: #ef4444; /* Rojo */
   padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 0.5rem;
   font-weight: 500;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .btn-logout:hover {
-  background-color: #dc2626;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* === Diseño Responsivo (Móviles y Tablets) === */
+@media (max-width: 820px) {
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
+  /* Ocultamos el nombre y email para ahorrar espacio */
+  .user-info {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar-menu {
+    gap: 0.2rem;
+  }
+
+  /* Dejamos solo los emojis en los links de navegación */
+  .nav-link {
+    padding: 0.5rem;
+  }
+
+  .nav-text, .logout-text {
+    display: none;
+  }
+
+  /* Ajustamos el gap general de la zona de usuario */
+  .navbar-user {
+    gap: 0.75rem;
+  }
 }

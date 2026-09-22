@@ -28,9 +28,20 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  // Genera las iniciales para el Avatar (ej: "Juan Pérez" -> "JP")
+  getInitials(): string {
+    if (!this.userName) return 'U';
+    const names = this.userName.split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return this.userName.substring(0, 2).toUpperCase();
+  }
+
   logout(): void {
+    // Usar window.location.origin asegura que funcione en localhost y en AWS CloudFront
     this.msalService.logoutRedirect({
-      postLogoutRedirectUri: 'http://localhost:4200/login'
+      postLogoutRedirectUri: `${window.location.origin}/login`
     });
   }
 }

@@ -1,13 +1,100 @@
 <app-navbar></app-navbar>
 
-<div class="page-container">
-  <h2>Catálogo de Productos</h2>
-  <div class="product-grid">
-    <div class="product-card" *ngFor="let product of products">
-      <h3>{{ product.name }}</h3>
-      <p class="category">{{ product.category }}</p>
-      <p class="price">${{ product.price }}</p>
-      <button class="btn-primary">Agregar al pedido</button>
+<div class="catalog-container">
+  <!-- Encabezado con título y acciones -->
+  <div class="header-row">
+    <div>
+      <h2>📦 Catálogo de Productos</h2>
+      <p class="subtitle">Gestiona y visualiza los productos disponibles en la plataforma.</p>
     </div>
+    <button *ngIf="isAdmin" class="btn-primary" (click)="abrirFormularioNuevo()">
+      <span>+</span> Nuevo Producto
+    </button>
+  </div>
+
+  <!-- Mensajes de Estado -->
+  <div *ngIf="error" class="alert error">{{ error }}</div>
+  <div *ngIf="cargando" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando catálogo de productos...</p>
+  </div>
+
+  <!-- Modal / Formulario Crear y Editar -->
+  <div *ngIf="mostrarFormulario && isAdmin" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>{{ editando ? '✏️ Editar Producto' : '✨ Nuevo Producto' }}</h3>
+        <button class="btn-icon-close" (click)="cancelarFormulario()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nombre del Producto</label>
+          <input type="text" placeholder="Ej. Teclado Mecánico RGB" [(ngModel)]="productoForm.name" />
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea rows="3" placeholder="Detalles del producto..." [(ngModel)]="productoForm.description"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio ($)</label>
+            <input type="number" min="0" placeholder="0" [(ngModel)]="productoForm.price" />
+          </div>
+          <div class="form-group">
+            <label>Stock Disponible</label>
+            <input type="number" min="0" placeholder="0" [(ngModel)]="productoForm.stock" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cancelarFormulario()">Cancelar</button>
+        <button class="btn-primary" (click)="guardarProducto()" [disabled]="!productoForm.name || productoForm.price <= 0">
+          {{ editando ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista Vía Cards/Tabla -->
+  <div *ngIf="!cargando && products.length === 0" class="empty-state">
+    <div class="empty-icon">📭</div>
+    <p>No hay productos registrados en el catálogo.</p>
+  </div>
+
+  <div *ngIf="!cargando && products.length > 0" class="table-card">
+    <table class="tabla">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th *ngIf="isAdmin" class="text-center">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let p of products">
+        <td class="col-id">#{{ p.id }}</td>
+        <td class="font-bold">{{ p.name }}</td>
+        <td class="text-muted">{{ p.description || 'Sin descripción' }}</td>
+        <td class="font-bold text-success">${{ p.price | number:'1.0-0' }}</td>
+        <td>
+            <span [class.stock-low]="p.stock <= 5" class="badge-stock">
+              {{ p.stock }} unidades
+            </span>
+        </td>
+        <td *ngIf="isAdmin" class="text-center">
+          <button class="btn-action-edit" (click)="abrirFormularioEditar(p)">
+            ✏️ Editar
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </div>

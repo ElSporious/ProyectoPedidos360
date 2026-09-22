@@ -1,19 +1,40 @@
 <nav class="navbar">
-  <div class="navbar-brand">
-    <a routerLink="/dashboard"><strong>Pedidos360</strong></a>
-  </div>
+  <div class="navbar-container">
 
-  <div class="navbar-menu">
-    <a routerLink="/dashboard" routerLinkActive="active">Inicio</a>
-    <a routerLink="/catalog" routerLinkActive="active">Catálogo</a>
-    <a routerLink="/orders" routerLinkActive="active">Mis Pedidos</a>
-  </div>
-
-  <div class="navbar-user">
-    <div class="user-info">
-      <span class="user-name">{{ userName }}</span>
-      <span class="user-email">{{ userEmail }}</span>
+    <!-- Marca / Logo -->
+    <div class="navbar-brand">
+      <a routerLink="/dashboard" class="brand-link">
+        <span class="brand-icon">🔄</span>
+        <strong>Pedidos360</strong>
+      </a>
     </div>
-    <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+
+    <!-- Enlaces de navegación -->
+    <div class="navbar-menu">
+      <a routerLink="/dashboard" routerLinkActive="active-link" class="nav-link">
+        <span class="nav-icon">🏠</span> <span class="nav-text">Inicio</span>
+      </a>
+      <a routerLink="/catalog" routerLinkActive="active-link" class="nav-link">
+        <span class="nav-icon">📦</span> <span class="nav-text">Catálogo</span>
+      </a>
+      <a routerLink="/orders" routerLinkActive="active-link" class="nav-link">
+        <span class="nav-icon">🧾</span> <span class="nav-text">Pedidos</span>
+      </a>
+    </div>
+
+    <!-- Perfil y Salida -->
+    <div class="navbar-user">
+      <div class="user-profile">
+        <div class="avatar">{{ getInitials() }}</div>
+        <div class="user-info">
+          <span class="user-name">{{ userName }}</span>
+          <span class="user-email">{{ userEmail }}</span>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()" title="Cerrar sesión">
+        <span class="logout-text">Salir</span> 🚪
+      </button>
+    </div>
+
   </div>
 </nav>
