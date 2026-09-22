@@ -1,0 +1,27 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <h2>Mis Pedidos</h2>
+  <table class="orders-table">
+    <thead>
+      <tr>
+        <th>ID Pedido</th>
+        <th>Fecha</th>
+        <th>Total</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let order of orders">
+        <td><strong>{{ order.id }}</strong></td>
+        <td>{{ order.date }}</td>
+        <td>${{ order.total }}</td>
+        <td>
+          <span class="badge" [class.completed]="order.status === 'Completado'">
+            {{ order.status }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
