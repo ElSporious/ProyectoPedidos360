@@ -3,6 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { MsalService, MsalBroadcastService } from '@azure/msal-angular';
 import { EventMessage, EventType, InteractionStatus, AuthenticationResult } from '@azure/msal-browser';
 import { filter } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -22,20 +23,16 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     // Escuchar cuando el login o refresco de token sea exitoso
-    this.msalBroadcastService.msalSubject$
+      this.msalService.instance.initialize().then(() => {
+    this.msalBroadcastService.inProgress$
       .pipe(
-        filter((msg: EventMessage) =>
-          msg.eventType === EventType.LOGIN_SUCCESS ||
-          msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
-        )
+        filter((status: InteractionStatus) => status === InteractionStatus.None),
+        take(1)  
       )
-      .subscribe((result: EventMessage) => {
-        const payload = result.payload as AuthenticationResult;
-        if (payload && payload.account) {
-          this.msalService.instance.setActiveAccount(payload.account);
-          this.router.navigate(['/dashboard']);
-        }
+      .subscribe(() => {
+        this.checkAndSetActiveAccount();
       });
+  });
 
     // Detectar cuando termine la interacción de MSAL y establecer la cuenta
     this.msalBroadcastService.inProgress$

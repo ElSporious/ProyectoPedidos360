@@ -45,15 +45,20 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 }
 
 
-export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
+  export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
   
-  // Usar la URL base sin wildcard problemÃ¡tico
+  const scopes = [`api://${environment.clientId}/access_as_user`];
+  
   protectedResourceMap.set(
-    'https://8qnm6s8z2m.execute-api.us-east-1.amazonaws.com', 
-    [`api://${environment.clientId}/access_as_user`]
+    'https://8qnm6s8z2m.execute-api.us-east-1.amazonaws.com',
+    scopes
   );
-// LOG TEMPORAL — bórralo después
+  protectedResourceMap.set(
+    'https://8qnm6s8z2m.execute-api.us-east-1.amazonaws.com/',
+    scopes
+  );
+
   console.log('ProtectedResourceMap:', [...protectedResourceMap.entries()]);
 
   return {

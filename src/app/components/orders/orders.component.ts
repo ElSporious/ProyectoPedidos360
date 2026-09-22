@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { environment } from '../../../environments/environment';
+import { MsalService } from '@azure/msal-angular';
 
 @Component({
   selector: 'app-orders',
@@ -16,30 +17,51 @@ export class OrdersComponent implements OnInit {
   cargando: boolean = true;
   error: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private msalService: MsalService) {}
 
   ngOnInit(): void {
     this.cargarPedidosReales();
   }
 
-  cargarPedidosReales(): void {
-  this.cargando = true;
-  this.error = '';
+  async cargarPedidosReales(): Promise<void> {
+    this.cargando = true;
+    this.error = '';
 
-  const url = `${environment.apiUrl}/api/orders`;
-  console.log('URL que se va a llamar:', url); // LOG TEMPORAL
+    try {
+      const account = this.msalService.instance.getActiveAccount();
+      if (!account) {
+        this.error = 'No hay cuenta activa';
+        this.cargando = false;
+        return;
+      }
 
-  this.http.get<any[]>(url).subscribe({
-    next: (datos) => {
-      console.log('Pedidos reales desde AWS:', datos);
-      this.orders = datos;
-      this.cargando = false;
-    },
-    error: (err) => {
-      console.error('Error al obtener pedidos desde AWS:', err);
-      this.error = 'No se pudieron cargar los pedidos.';
+      const tokenResponse = await this.msalService.instance.acquireTokenSilent({
+        scopes: [`api://${environment.clientId}/access_as_user`],
+        account: account
+      });
+
+      console.log('Token obtenido:', tokenResponse.accessToken.substring(0, 50));
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${tokenResponse.accessToken}`
+      });
+
+      this.http.get<any[]>(`${environment.apiUrl}/api/orders`, { headers }).subscribe({
+        next: (datos) => {
+          console.log('Pedidos:', datos);
+          this.orders = datos;
+          this.cargando = false;
+        },
+        error: (err) => {
+          console.error('Error:', err);
+          this.error = 'No se pudieron cargar los pedidos.';
+          this.cargando = false;
+        }
+      });
+    } catch (err) {
+      console.error('Error obteniendo token:', err);
+      this.error = 'Error de autenticaciÃ³n.';
       this.cargando = false;
     }
-  });
-}
+  }
 }
