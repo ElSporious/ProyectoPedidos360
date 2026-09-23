@@ -1,0 +1,14 @@
+spring.application.name=pedidos360
+
+server.port=8080
+
+spring.datasource.url=jdbc:postgresql://HOST:5432/pedidos360?sslmode=require
+spring.datasource.username=TU_USUARIO_BD
+spring.datasource.password=TU_PASSWORD_BD
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+spring.security.oauth2.resourceserver.jwt.issuer-uri=https://login.microsoftonline.com/TU_TENANT_ID_AZURE/v2.0
+spring.security.oauth2.resourceserver.jwt.audiences=TU_CLIENT_ID_AZURE
