@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+target/
+*.jar
+*.war
+.env
+application-local.properties
