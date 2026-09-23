@@ -1,28 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, NavbarComponent],
+  imports: [CommonModule, NavbarComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit {
-  roles: string[] = [];
-  isAdmin = false;
-  isOperador = false;
-  isCliente = false;
+export class DashboardComponent {
 
-  constructor(private authService: AuthService) {}
+  constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    this.roles = this.authService.getRoles();
-    this.isAdmin = this.authService.isAdmin();
-    this.isOperador = this.authService.isOperador();
-    this.isCliente = this.authService.isCliente();
+  irACatalogo() {
+    this.router.navigate(['/catalog']); 
+  }
+
+  irAPedidos() {
+    this.router.navigate(['/orders']); 
   }
 }

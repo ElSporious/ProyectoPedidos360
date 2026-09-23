@@ -9,7 +9,7 @@
       </h2>
       <p class="page-subtitle">Monitorea y cambia los estados de flujo de entrega en tiempo real.</p>
     </div>
-    <button *ngIf="isCliente || isAdmin" class="btn btn-primary" (click)="abrirFormularioNuevo()">
+    <button *ngIf="isCliente || isOperador" class="btn btn-primary" (click)="abrirFormularioNuevo()">
       <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
       </svg>
@@ -27,8 +27,8 @@
     <p>Cargando órdenes de compra...</p>
   </div>
 
-  <!-- Modal / Formulario Nuevo Pedido -->
-  <div *ngIf="mostrarFormulario && (isCliente || isAdmin)" class="modal-overlay">
+  <!-- Modal / Formulario Nuevo Pedido (Corregido para incluir isOperador) -->
+  <div *ngIf="mostrarFormulario && (isCliente || isOperador)" class="modal-overlay">
     <div class="modal-card">
       <header class="modal-header">
         <h3 class="modal-title"><span class="icon">🛍️</span> Crear Solicitud de Pedido</h3>
@@ -105,10 +105,9 @@
           <td class="col-id font-mono">#{{ o.id }}</td>
           <td class="font-medium text-main">{{ o.customerEmail || 'Cliente N/A' }}</td>
           <td>
-            <!-- El método getEstadoClass debe devolver clases extra que definas en tu CSS, ej: 'badge-success', 'badge-warning' -->
             <span class="badge badge-estado" [class]="getEstadoClass(o.status)">
-                {{ o.status }}
-              </span>
+              {{ o.status }}
+            </span>
           </td>
           <td class="text-muted text-sm">{{ o.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
           <td>

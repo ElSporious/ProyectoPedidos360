@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -24,12 +24,13 @@ export class CatalogComponent implements OnInit {
   isOperador = false;
   isCliente = false;
 
-  // Formulario / Modal
-  mostrarModal = false;
-  modoEdicion = false;
+  // Formulario / Modal (Nombres corregidos para coincidir con el HTML)
+  mostrarFormulario = false; 
+  editando = false; 
   productoForm = {
     id: null,
     name: '',
+    description: '', // <-- Añadido porque el HTML lo pide
     price: 0,
     stock: 0
   };
@@ -37,7 +38,8 @@ export class CatalogComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private msalService: MsalService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -68,15 +70,18 @@ export class CatalogComponent implements OnInit {
         next: (datos) => {
           this.products = datos;
           this.cargando = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           this.error = 'No se pudieron obtener los productos del catálogo.';
           this.cargando = false;
+          this.cdr.detectChanges();
         }
       });
     } catch {
       this.error = 'Error de autenticación.';
       this.cargando = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -89,29 +94,30 @@ export class CatalogComponent implements OnInit {
     );
   }
 
-  abrirModalNuevo(): void {
-    this.modoEdicion = false;
-    this.productoForm = { id: null, name: '', price: 0, stock: 0 };
-    this.mostrarModal = true;
+  // Nombres de métodos corregidos
+  abrirFormularioNuevo(): void {
+    this.editando = false;
+    this.productoForm = { id: null, name: '', description: '', price: 0, stock: 0 };
+    this.mostrarFormulario = true;
   }
 
-  abrirModalEditar(producto: any): void {
-    this.modoEdicion = true;
+  abrirFormularioEditar(producto: any): void {
+    this.editando = true;
     this.productoForm = { ...producto };
-    this.mostrarModal = true;
+    this.mostrarFormulario = true;
   }
 
-  cerrarModal(): void {
-    this.mostrarModal = false;
+  cancelarFormulario(): void {
+    this.mostrarFormulario = false;
   }
 
   async guardarProducto(): Promise<void> {
     try {
       const headers = await this.getHeaders();
-      if (this.modoEdicion && this.productoForm.id) {
+      if (this.editando && this.productoForm.id) {
         this.http.put(`${environment.apiUrl}/api/catalog/products/${this.productoForm.id}`, this.productoForm, { headers }).subscribe({
           next: () => {
-            this.cerrarModal();
+            this.cancelarFormulario();
             this.cargarProductos();
           },
           error: () => { this.error = 'No se pudo actualizar el producto.'; }
@@ -119,7 +125,7 @@ export class CatalogComponent implements OnInit {
       } else {
         this.http.post(`${environment.apiUrl}/api/catalog/products`, this.productoForm, { headers }).subscribe({
           next: () => {
-            this.cerrarModal();
+            this.cancelarFormulario();
             this.cargarProductos();
           },
           error: () => { this.error = 'No se pudo crear el producto.'; }

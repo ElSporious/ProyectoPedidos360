@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -39,7 +39,8 @@ export class OrdersComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private msalService: MsalService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -71,15 +72,18 @@ export class OrdersComponent implements OnInit {
         next: (datos) => {
           this.orders = datos;
           this.cargando = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           this.error = 'No se pudieron consultar los pedidos.';
           this.cargando = false;
+          this.cdr.detectChanges();
         }
       });
     } catch {
       this.error = 'Error de autenticación.';
       this.cargando = false;
+      this.cdr.detectChanges();
     }
   }
 
