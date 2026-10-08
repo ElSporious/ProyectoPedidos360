@@ -12,3 +12,10 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 spring.security.oauth2.resourceserver.jwt.issuer-uri=https://login.microsoftonline.com/TU_TENANT_ID_AZURE/v2.0
 spring.security.oauth2.resourceserver.jwt.audiences=TU_CLIENT_ID_AZURE
+
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
