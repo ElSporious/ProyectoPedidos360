@@ -1,7 +1,9 @@
 package com.example.pedidos360.service;
 
-import com.example.pedidos360.dto.OrderRequest;
 import com.example.pedidos360.dto.OrderItemRequest;
+import com.example.pedidos360.dto.OrderRequest;
+import com.example.pedidos360.dto.PedidoEvento;
+import com.example.pedidos360.messaging.producer.PedidoEventoProducer;
 import com.example.pedidos360.model.Order;
 import com.example.pedidos360.model.OrderItem;
 import com.example.pedidos360.model.OrderStatus;
@@ -22,13 +24,14 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final PedidoEventoProducer pedidoEventoProducer;
 
     @Transactional
     public Order createOrder(OrderRequest request, String customerEmail) {
         Order order = new Order();
         order.setCustomerEmail(customerEmail);
         order.setCreatedAt(LocalDateTime.now());
-        order.setStatus(OrderStatus.CREADO); // Estado inicial por defecto
+        order.setStatus(OrderStatus.CREADO);
 
         List<OrderItem> items = new ArrayList<>();
         for (OrderItemRequest itemReq : request.items()) {
@@ -39,12 +42,22 @@ public class OrderService {
             item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(itemReq.quantity());
-            item.setPrice(product.getPrice()); // Congela el precio al momento del pedido
+            item.setPrice(product.getPrice());
 
             items.add(item);
         }
         order.setItems(items);
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        PedidoEvento evento = new PedidoEvento(
+                savedOrder.getId(),
+                savedOrder.getStatus().name(),
+                savedOrder.getCustomerEmail(),
+                LocalDateTime.now()
+        );
+        pedidoEventoProducer.publicar("pedido.creado", evento);
+
+        return savedOrder;
     }
 
     public List<Order> getAllOrders() {
@@ -64,12 +77,10 @@ public class OrderService {
     public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = getOrderById(orderId);
 
-        // Regla de negocio: No se puede DESPACHAR sin haber sido ACEPTADO antes
         if (newStatus == OrderStatus.DESPACHADO && order.getStatus() == OrderStatus.CREADO) {
             throw new RuntimeException("No se puede despachar un pedido sin haber sido aceptado.");
         }
 
-        // Regla de negocio: Al ACEPTAR un pedido, el stock debe disminuir
         if (newStatus == OrderStatus.ACEPTADO && order.getStatus() == OrderStatus.CREADO) {
             for (OrderItem item : order.getItems()) {
                 Product product = item.getProduct();
@@ -77,11 +88,28 @@ public class OrderService {
                     throw new RuntimeException("Stock insuficiente para el producto: " + product.getName());
                 }
                 product.setStock(product.getStock() - item.getQuantity());
-                productRepository.save(product); // Actualiza el stock decrecido
+                productRepository.save(product);
             }
         }
 
         order.setStatus(newStatus);
-        return orderRepository.save(order);
+        Order updatedOrder = orderRepository.save(order);
+
+        // 🚀 PUBLICAR EVENTO SEGÚN EL NUEVO ESTADO (pedido.aceptado / pedido.despachado)
+        String routingKey = switch (newStatus) {
+            case ACEPTADO -> "pedido.aceptado";
+            case DESPACHADO -> "pedido.despachado";
+            default -> "pedido.actualizado";
+        };
+
+        PedidoEvento evento = new PedidoEvento(
+                updatedOrder.getId(),
+                updatedOrder.getStatus().name(),
+                updatedOrder.getCustomerEmail(),
+                LocalDateTime.now()
+        );
+        pedidoEventoProducer.publicar(routingKey, evento);
+
+        return updatedOrder;
     }
 }
