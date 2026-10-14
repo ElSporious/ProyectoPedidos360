@@ -1,5 +1,6 @@
 package com.example.pedidos360.service;
 
+import com.example.pedidos360.config.RabbitMQConfig;
 import com.example.pedidos360.dto.OrderItemRequest;
 import com.example.pedidos360.dto.OrderRequest;
 import com.example.pedidos360.dto.PedidoEvento;
@@ -55,7 +56,7 @@ public class OrderService {
                 savedOrder.getCustomerEmail(),
                 LocalDateTime.now()
         );
-        pedidoEventoProducer.publicar("pedido.creado", evento);
+        pedidoEventoProducer.publicar(RabbitMQConfig.RK_CREADO, evento);
 
         return savedOrder;
     }
@@ -97,9 +98,9 @@ public class OrderService {
 
         // 🚀 PUBLICAR EVENTO SEGÚN EL NUEVO ESTADO (pedido.aceptado / pedido.despachado)
         String routingKey = switch (newStatus) {
-            case ACEPTADO -> "pedido.aceptado";
-            case DESPACHADO -> "pedido.despachado";
-            default -> "pedido.actualizado";
+            case ACEPTADO -> RabbitMQConfig.RK_ACEPTADO;
+            case DESPACHADO -> RabbitMQConfig.RK_DESPACHADO;
+            default -> RabbitMQConfig.RK_ACTUALIZADO;
         };
 
         PedidoEvento evento = new PedidoEvento(

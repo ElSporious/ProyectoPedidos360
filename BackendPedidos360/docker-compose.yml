@@ -11,5 +11,18 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  postgres:
+    image: postgres:16
+    container_name: dsy1107-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: pedidos360
+      POSTGRES_USER: pedidos
+      POSTGRES_PASSWORD: pedidos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   rabbitmq_data:
+  postgres_data:

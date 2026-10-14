@@ -57,7 +57,8 @@ Angular (MSAL) → Microsoft Entra ID → Access Token JWT
 ```
 ProyectoPedidos360/
 ├── FrontendPedidos360/        # Aplicación Angular
-└── BackendPedidos360/         # API REST Spring Boot
+├── BackendPedidos360/         # API REST Spring Boot
+└── AdminRabbitPedidos360/     # Microservicio administrador de RabbitMQ
 ```
 
 ---
@@ -103,6 +104,47 @@ cd BackendPedidos360
 ./mvnw clean package -DskipTests
 java -jar target/*.jar
 ```
+
+---
+
+### Backend en local (sin AWS ni Azure)
+
+1. Levanta RabbitMQ y PostgreSQL:
+```bash
+cd BackendPedidos360
+docker compose up -d
+```
+
+2. Ejecuta con el perfil `local`:
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+3. Tokens de prueba (en vez del JWT de Entra ID): `admin`, `operador`, `cliente`
+```bash
+curl -H "Authorization: Bearer operador" http://localhost:8080/api/orders
+```
+
+Panel de RabbitMQ: `http://localhost:15672` (guest / guest)
+
+### Microservicio administrador de RabbitMQ (local)
+
+```bash
+cd AdminRabbitPedidos360
+./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"
+```
+
+Corre en `http://localhost:8081` y requiere el token `admin`:
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/api/admin/queues` | Crear cola (opcional: `durable`, `deadLetterExchange`, `deadLetterRoutingKey`, `ttlMs`, `maxLength`) |
+| GET | `/api/admin/queues/{name}` | Ver mensajes y consumidores de una cola |
+| DELETE | `/api/admin/queues/{name}` | Eliminar cola |
+| POST | `/api/admin/exchanges` | Crear exchange (`direct`, `topic` o `fanout`) |
+| DELETE | `/api/admin/exchanges/{name}` | Eliminar exchange |
+| POST | `/api/admin/bindings` | Crear binding (`queue`, `exchange`, `routingKey`) |
+| DELETE | `/api/admin/bindings` | Eliminar binding |
 
 ---
 
